@@ -4,7 +4,6 @@ node_modules
 mnemonic.ts
 infuraAPI.ts
 
-node_modules
 .env
 coverage
 coverage.json

@@ -1,0 +1,8 @@
+{
+    "recommendations": [
+        "JuanBlanco.solidity",
+        "esbenp.prettier-vscode",
+        "aaron-bond.better-comments",
+        "equinusocio.vsc-material-theme-icons"
+    ]
+}

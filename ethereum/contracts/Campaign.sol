@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.9;
- 
-// import "hardhat/console.sol";
+pragma solidity >=0.7.0 <0.9.0;
 
 /**
  * @title CampaignFactory
@@ -72,8 +70,6 @@ contract Campaign {
      * @param minimum Set the minimumContribution amount
      */
     constructor(uint minimum, address campaignCreator) {
-        // console.log("This Campaign contract was deployed by: ", campaignCreator);
-        // console.log("The minimum amount to enter this contract is: ", minimum);
 
         manager = campaignCreator;
         minimumContribution = minimum;
