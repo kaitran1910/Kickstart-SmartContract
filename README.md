@@ -40,6 +40,7 @@ To run all test files in the `./ethereum/test/*` folder
 ### `ts-node scripts/deploy.ts | tee scripts/assets/deployOutput.txt`
 
 To actually deploy the contract to the Rinkeby Testnet by using InfuraAPI
+Write the output on the terminal to the `deployOutput.txt` file by using `| tee`
 
 **IMPORTANT!**
 Make sure to duplicate the mnemonic.js.sample and the infuraAPI.js.sample
