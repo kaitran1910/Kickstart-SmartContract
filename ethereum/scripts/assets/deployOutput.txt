@@ -1,0 +1,37 @@
+Attempting to deploy CampaignFactory from account 0x6a10491a8fDD29e3E8b0598bDAf95acc0E89A296
+[
+        {
+            "inputs": [
+                {
+                    "internalType": "uint256",
+                    "name": "minimum",
+                    "type": "uint256"
+                }
+            ],
+            "name": "createCampaign",
+            "outputs": [],
+            "stateMutability": "nonpayable",
+            "type": "function"
+        },
+        {
+            "inputs": [
+                { "internalType": "uint256", "name": "", "type": "uint256" }
+            ],
+            "name": "deployedCampaigns",
+            "outputs": [
+                { "internalType": "address", "name": "", "type": "address" }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "name": "getDeployedCampaigns",
+            "outputs": [
+                { "internalType": "address[]", "name": "", "type": "address[]" }
+            ],
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ]
+Contract deployed to: 0x76b8292C900353C673229358880D9046B112E650
