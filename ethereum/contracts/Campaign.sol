@@ -29,7 +29,7 @@ contract Campaign {
     /***** Request Struct *****/
     struct Request {
         string description; // Purpose of request
-        uint value; // Ether to transfer
+        uint value; // Wei to transfer
         address recipient;  // Who gets the money
         bool complete;  // Whether the request is done
         mapping(address => bool) approvals; // Track who has voted
@@ -54,7 +54,9 @@ contract Campaign {
 
 
     /***** Functions *****/
-    // modifier to check if caller is the manager
+    /**
+     * @dev modifier To check if caller is the manager
+     */
     modifier restricted() {
         /* If the first argument of 'require' evaluates to 'false', execution terminates and all
         changes to the state and to Ether balances are reverted.
@@ -66,7 +68,7 @@ contract Campaign {
     }
 
     /**
-     * @dev Set contract deployer as manager
+     * @dev constructor Set contract deployer as manager
      * @param minimum Set the minimumContribution amount
      */
     constructor(uint minimum, address campaignCreator) {
@@ -92,7 +94,7 @@ contract Campaign {
      * @dev Can only called by the manager to create a new spending request
      *
      * @param description Purpose of the request
-     * @param value Amount to spend/transfer (Ether)
+     * @param value Amount to spend/transfer (Wei)
      * @param recipient The address of where the contract will spend money to 
      */
     function createRequest( 

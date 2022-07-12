@@ -27,7 +27,6 @@ const web3 = new Web3(ganache.provider());
 
 const compiledFactory = require("../build/CampaignFactory.json");
 const compiledCampaign = require("../build/Campaign.json");
-// const { abi, evm } = require("../scripts/compile");
 
 /**
  * Mocha functions:
@@ -35,7 +34,11 @@ const compiledCampaign = require("../build/Campaign.json");
  * - it: Run a test and make an assertion
  * - describe: Group "it" tests together
  */
-let accounts;
+// let accounts;
+// let factory;
+// let campaignAddress;
+// let campaign;
+let accounts: any[];
 let factory: {
     methods: {
         createCampaign: (arg0: string) => {
@@ -52,7 +55,46 @@ let factory: {
     options: { address: any };
 };
 let campaignAddress;
-let campaign: { options: { address: any } };
+let campaign: {
+    options: { address: any };
+    methods: {
+        manager: () => { (): any; new (): any; call: { (): any; new (): any } };
+        contribute: () => {
+            (): any;
+            new (): any;
+            send: { (arg0: { value: any; from: any }): any; new (): any };
+        };
+        approvers: (arg0: any) => {
+            (): any;
+            new (): any;
+            call: { (): any; new (): any };
+        };
+        createRequest: (
+            arg0: string,
+            arg1: string,
+            arg2: any
+        ) => {
+            (): any;
+            new (): any;
+            send: { (arg0: { from: any; gas: string }): any; new (): any };
+        };
+        requests: (arg0: number) => {
+            (): any;
+            new (): any;
+            call: { (): any; new (): any };
+        };
+        approveRequest: (arg0: number) => {
+            (): any;
+            new (): any;
+            send: { (arg0: { from: any; gas: string }): any; new (): any };
+        };
+        finalizeRequest: (arg0: number) => {
+            (): any;
+            new (): any;
+            send: { (arg0: { from: any; gas: string }): any; new (): any };
+        };
+    };
+};
 
 /**
  * ? When gas is "1_000_000", the test will fail. Why???
@@ -82,7 +124,7 @@ beforeEach(async () => {
 
     // Create a new contract instance
     campaign = await new web3.eth.Contract(
-        compiledFactory.abi,
+        compiledCampaign.abi,
         campaignAddress
     );
 });
@@ -91,8 +133,96 @@ beforeEach(async () => {
  * Use it.only() to run a specific test
  */
 describe("Campaigns", () => {
-    it("deploys a CampaignFactory and a Campaign", () => {
+    it("deploys a CampaignFactory contract and a Campaign contract", () => {
         assert.ok(factory.options.address);
         assert.ok(campaign.options.address);
+    });
+
+    it("marks caller as the campaign manager", async () => {
+        const manager = await campaign.methods.manager().call();
+        assert.equal(accounts[1], manager);
+    });
+
+    it("allows people to contribute money and marks them as approvers", async () => {
+        await campaign.methods.contribute().send({
+            value: "200",
+            from: accounts[2],
+        });
+
+        const isContributor = await campaign.methods
+            .approvers(accounts[2])
+            .call();
+        assert(isContributor);
+    });
+
+    it("requires a minimum contribution", async () => {
+        try {
+            await campaign.methods.contribute().send({
+                value: "5",
+                from: accounts[2],
+            });
+            assert(false);
+        } catch (err) {
+            assert(err);
+        }
+    });
+
+    it("allows a manager to make a payment request", async () => {
+        await campaign.methods
+            .createRequest("Buy screen", "100", accounts[3])
+            .send({
+                from: accounts[1],
+                gas: "3000000",
+            });
+
+        const chosenRequest = await campaign.methods.requests(0).call();
+        assert.equal("Buy screen", chosenRequest.description);
+    });
+
+    it.only("processes requests from beginning to the end", async () => {
+        await campaign.methods.contribute().send({
+            from: accounts[2],
+            value: web3.utils.toWei("10", "ether"),
+        });
+        console.log("\taccounts[2] contribute 10 ether - become a contributor");
+
+        await campaign.methods
+            .createRequest(
+                "A new screen",
+                web3.utils.toWei("5", "ether"),
+                accounts[5]
+            )
+            .send({
+                from: accounts[1],
+                gas: "3000000",
+            });
+        console.log(
+            "\taccounts[1] - contract manager, create a request to send 5 Ether to accounts[5]"
+        );
+
+        await campaign.methods.approveRequest(0).send({
+            from: accounts[2],
+            gas: "3000000",
+        });
+        console.log("\tContributor approve the request");
+
+        await campaign.methods.finalizeRequest(0).send({
+            from: accounts[1],
+            gas: "3000000",
+        });
+        console.log("\tContract manager, finalize the request");
+
+        let finalBalance = await web3.eth.getBalance(accounts[5]);
+        finalBalance = web3.utils.fromWei(finalBalance, "ether");
+        finalBalance = parseFloat(finalBalance);
+        console.log("\tCurrent balance of accounts[5]: " + finalBalance);
+
+        let baseBalance = await web3.eth.getBalance(accounts[6]);
+        baseBalance = web3.utils.fromWei(baseBalance, "ether");
+        baseBalance = parseFloat(baseBalance);
+        console.log("\tBase balance of an account: " + baseBalance);
+
+        // assert(balance > 104);
+        assert(finalBalance > baseBalance + 4);
     });
 });
